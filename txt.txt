@@ -1,0 +1,32 @@
+data = [
+  {
+    title: "Four Corners of the Earth",
+    verse: "Isaiah 11:12",
+    text: "He will gather the dispersed of Judah from the four corners of the earth.",
+    image: "images/Orlando-Ferguson-flat-earth-map_edit.jpg"
+  },
+  {
+    title: "Circle of the Earth",
+    verse: "Isaiah 40:22",
+    text: "He sits enthroned above the circle of the earth.",
+    image: "images/reflections-flat-earth-movement (1).webp"
+  },
+  {
+    title: "The Firmament",
+    verse: "Genesis 1:6-8",
+    text: "Let there be a firmament in the midst of the waters.",
+    image: "images/Genesis-1-2.jpg"
+  },
+  {
+    title: "Earth Fixed",
+    verse: "Psalm 104:5",
+    text: "He set the earth on its foundations; it can never be moved.",
+    image: "images/Early_Hebrew_Conception_of_the_Universe.svg.png"
+  },
+  {
+    title: "Ends of the Earth",
+    verse: "Daniel 4:11",
+    text: "It was visible to the ends of the whole earth.",
+    image: "images/Orlando-Ferguson-flat-earth-map_edit.jpg"
+  }
+];
