@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Biblical Earth Model Explorer</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top, #020617, #000);
+    color: white;
+    text-align: center;
+    overflow-x: hidden;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    margin-top: 30px;
+    text-shadow: 0 0 15px rgba(0,150,255,0.8);
+    animation: fadeDown 1s ease;
+  }
+
+  .subtitle {
+    opacity: 0.7;
+    margin-bottom: 20px;
+  }
+
+  .toggle button {
+    background: rgba(0,150,255,0.2);
+    color: white;
+  }
+
+  .toggle button:hover {
+    background: rgba(0,150,255,0.5);
+    box-shadow: 0 0 10px rgba(0,150,255,0.8);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 30px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0 10px rgba(0,150,255,0.2);
+  }
+
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0,150,255,0.8);
+  }
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    background: #020617;
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 600px;
+    animation: zoomIn 0.4s ease;
+    box-shadow: 0 0 20px rgba(0,150,255,0.5);
+  }
+
+  img {
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 15px;
+  }
+
+  button {
+    margin: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+  }
+
+  .quiz {
+    margin: 40px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,150,255,0.2);
+  }
+
+  .video-section {
+    margin: 40px auto;
+    padding: 20px;
+    max-width: 900px;
+  }
+  
+  .video-section h2 {
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 10px rgba(0,150,255,0.7);
+  }
+  
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    max-width: 300px;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,150,255,0.5);
+  }
+  
+  .video-container iframe {
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+  }
+
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes zoomIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<h1>🌍 Biblical Earth Model Explorer</h1>
+<p class="subtitle">Exploring Scripture, Perspective, and Understanding</p>
+
+<div class="toggle">
+  <button onclick="setMode('biblical')">Biblical View</button>
+  <button onclick="setMode('science')">Scientific View</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="modal" id="modal">
+  <div class="modal-content" id="modalContent"></div>
+</div>
+
+<div class="video-section">
+    <h2>🎬 Jesus Love Revealed</h2>
+    <p>Watch and explore teachings directly from the channel</p>
+  
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/aeL-AqoGeIc?si=qRxeO13mEpjjTJjT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+  </div>
+
+<div class="quiz">
+  <h2>🧠 Test Your Knowledge</h2>
+  <p id="question"></p>
+  <div id="answers"></div>
+  <p id="result"></p>
+</div>
+
+<script>
+// ⭐ TWINKLING STARS
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = Array.from({length: 150}, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  r: Math.random() * 2,
+  d: Math.random()
+}));
+
+function drawStars() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s => {
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${s.d})`;
+    ctx.fill();
+    s.d += (Math.random() - 0.5) * 0.05;
+    if (s.d < 0) s.d = 0;
+    if (s.d > 1) s.d = 1;
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// 📖 DATA
+let mode = "biblical";
+
+const biblicalData = [
+  {
+    title:"Four Corners",
+    verse:"Isaiah 11:12",
+    text:"Four corners of the earth",
+    image:"images/Orlando-Ferguson-flat-earth-map_edit.jpg",
+    video:"https://www.youtube.com/embed/CBsG2oVrpn_PQb5"
+  },
+  {
+    title:"Firmament",
+    verse:"Genesis 1:6-8",
+    text:"Firmament divides waters",
+    image:"images/Genesis-1-2.jpg",
+    audio:"audio/genesis.mp3",
+    video:"https://www.youtube.com/embed/"
+  },
+  {
+    title:"Earth Fixed",
+    verse:"Psalm 104:5",
+    text:"Earth set on foundations",
+    image:"images/Early_Hebrew_Conception_of_the_Universe.svg.png",
+    video:"https://www.youtube.com/embed/"
+  },
+  {
+    title:"Ends of Earth",
+    verse:"Daniel 4:11",
+    text:"Visible to ends of earth",
+    image:"images/Orlando-Ferguson-flat-earth-map_edit.jpg",
+    video:"https://www.youtube.com/embed/"
+  }
+];
+
+const scienceData = [
+  {
+    title:"Spherical Earth",
+    verse:"Science",
+    text:"Earth is a sphere",
+    image:"images/earth-satelite.png"
+  }
+];
+
+function openModal(item){
+    modal.style.display="flex";
+  
+    modalContent.innerHTML = `
+      <h2>${item.title}</h2>
+      <p>${item.verse}</p>
+      <p>${item.text}</p>
+  
+      <img src="${item.image}">
+  
+      ${item.video ? `
+        <div class="video-container">
+          <iframe src="${item.video}" frameborder="0" allowfullscreen></iframe>
+        </div>
+      ` : ""}
+  
+      ${item.audio ? `<button onclick="playAudio('${item.audio}')">▶ Play Audio</button>`:""}
+  
+      <button onclick="closeModal()">Close</button>
+    `;
+  }
+
+
+
+
+
+
+
+
+function render() {
+  grid.innerHTML = "";
+  const data = mode === "biblical" ? biblicalData : scienceData;
+
+  data.forEach(item => {
+    let card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h3>${item.title}</h3><p>${item.verse}</p>`;
+    card.onclick = () => openModal(item);
+    grid.appendChild(card);
+  });
+}
+
+function setMode(m){ mode = m; render(); }
+
+// 🔊 AUDIO
+let audioPlayer = new Audio();
+function playAudio(src){ audioPlayer.src = src; audioPlayer.play(); }
+
+// 📦 MODAL
+function openModal(item){
+  modal.style.display="flex";
+  modalContent.innerHTML = `
+    <h2>${item.title}</h2>
+    <p>${item.verse}</p>
+    <p>${item.text}</p>
+    <img src="${item.image}">
+    ${item.audio ? `<button onclick="playAudio('${item.audio}')">▶ Play Audio</button>`:""}
+    <button onclick="closeModal()">Close</button>
+  `;
+}
+function closeModal(){ modal.style.display="none"; }
+
+// 🧠 QUIZ
+const quiz = [
+  {q:"Which verse mentions four corners?",a:["Isaiah 11:12","John 3:16","Genesis 1:1"],correct:0},
+  {q:"Which passage describes the firmament?",a:["Genesis 1:6-8","Psalm 23","Matthew 5"],correct:0},
+  {q:"Which book mentions ends of the earth?",a:["Daniel","Luke","Acts"],correct:0}
+];
+
+let qIndex = 0;
+
+function loadQuiz(){
+  let q = quiz[qIndex];
+  question.innerText = q.q;
+  answers.innerHTML = "";
+
+  q.a.forEach((ans,i)=>{
+    let btn = document.createElement("button");
+    btn.innerText = ans;
+    btn.onclick = ()=>{
+      result.innerText = i===q.correct?"✅ Correct!":"❌ Try again!";
+      setTimeout(()=>{
+        qIndex = (qIndex+1)%quiz.length;
+        result.innerText="";
+        loadQuiz();
+      },1500);
+    };
+    answers.appendChild(btn);
+  });
+}
+
+render();
+loadQuiz();
+</script>
+
+</body>
+</html>
